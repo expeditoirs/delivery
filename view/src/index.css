@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #3B82F6;
+  --color-secondary: #334155;
+  --color-accent: #14B8A6;
+  --color-bg: #0B0F19;
+  --color-surface: #111827;
+  --color-surface-soft: rgba(17, 24, 39, 0.72);
+  --color-text: #CBD5E1;
+  --color-text-muted: #94A3B8;
+  --color-border: rgba(148, 163, 184, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100vw;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 32%), var(--color-bg);
+  color: var(--color-text);
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+.theme-surface {
+  background: var(--color-surface-soft);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.theme-card {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.95), rgba(11, 15, 25, 0.92));
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.theme-button-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: white;
+}
+
+.theme-button-secondary {
+  background: rgba(51, 65, 85, 0.45);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.theme-input {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(59, 130, 246, 0.16);
+  color: var(--color-text);
+}
+
+.theme-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.text-theme-primary { color: var(--color-primary); }
+.text-theme-accent { color: var(--color-accent); }
+.text-theme-muted { color: var(--color-text-muted); }
+.border-theme { border-color: var(--color-border); }
+.bg-theme { background: var(--color-bg); }
+
+.carousel-container {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 15px;
+  padding-left: 20px;
+}
+
+.carousel-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+  scroll-snap-align: start;
+}
+
+.item-image {
+  width: 70px;
+  height: 70px;
+  background-color: rgba(51, 65, 85, 0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  margin-bottom: 8px;
+}

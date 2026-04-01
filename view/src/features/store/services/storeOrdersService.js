@@ -1,7 +1,7 @@
 import api from '../../../core/api';
 
-export async function fetchStoreOrders(storeId) {
-  const { data } = await api.get(`/pedido/empresa/${storeId}`);
+export async function fetchStoreOrders(storeId, params = {}) {
+  const { data } = await api.get(`/pedido/empresa/${storeId}`, { params });
   return data || [];
 }
 

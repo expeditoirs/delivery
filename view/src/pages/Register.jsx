@@ -39,17 +39,17 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-theme flex flex-col items-center justify-center px-4 py-6">
+    <div className="theme-page flex min-h-screen flex-col items-center justify-center px-4 py-6">
       <div className="w-full max-w-md theme-card rounded-3xl p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center"><span className="material-icons text-theme-accent">person_add</span></div>
+          <div className="theme-glass w-12 h-12 rounded-2xl flex items-center justify-center"><span className="material-icons text-theme-accent">person_add</span></div>
           <div>
-            <h1 className="text-xl font-bold text-slate-50">Criar conta</h1>
+            <h1 className="theme-title text-xl font-bold">Criar conta</h1>
             <p className="text-xs text-theme-muted">Cadastre usuário ou loja</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 bg-slate-900/70 rounded-2xl p-1 mb-5 border border-theme">
+        <div className="theme-glass mb-5 grid grid-cols-2 rounded-2xl border border-theme p-1">
           <button type="button" onClick={() => setTipo("usuario")} className={`py-2 rounded-xl text-sm font-semibold ${tipo === "usuario" ? "bg-blue-500/15 text-theme-primary" : "text-theme-muted"}`}>Usuário</button>
           <button type="button" onClick={() => setTipo("loja")} className={`py-2 rounded-xl text-sm font-semibold ${tipo === "loja" ? "bg-blue-500/15 text-theme-primary" : "text-theme-muted"}`}>Loja</button>
         </div>

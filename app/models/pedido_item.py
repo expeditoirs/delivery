@@ -14,3 +14,4 @@ class PedidoItem(Base):
     observacao = Column(Text, nullable=True)
     tamanho = Column(String(50), nullable=True)
     sabores = Column(JSON, nullable=True)
+    complementos = Column(JSON, nullable=True)

@@ -1,10 +1,12 @@
+import { formatStoreCategories } from "../../../utils/storeCategories";
+
 export default function RestaurantStrip({ empresas, loading, onOpen }) {
   return (
     <section className="px-4 mt-6">
       <div className="flex items-center justify-between mb-3">
         <div>
           <h2 className="text-base font-bold text-slate-50">Lojas em destaque</h2>
-          <p className="text-xs text-theme-muted">Escolha rápido e abra o cardápio</p>
+          <p className="text-xs text-theme-muted">Escolha rapido e abra o cardapio</p>
         </div>
         <span className="text-xs text-theme-muted">Top locais</span>
       </div>
@@ -29,13 +31,13 @@ export default function RestaurantStrip({ empresas, loading, onOpen }) {
               <span className="material-icons">storefront</span>
             </div>
             <p className="font-bold text-sm text-slate-50 truncate">{empresa.nome_empresa}</p>
-            <p className="text-xs text-theme-muted mt-1 truncate">{empresa.categoria_empresa || "Loja"}</p>
+            <p className="text-xs text-theme-muted mt-1 truncate">{formatStoreCategories(empresa, "Loja")}</p>
             <div className="mt-3 flex items-center justify-between text-xs text-theme-muted">
               <span className="inline-flex items-center gap-1">
                 <span className="material-icons text-sm text-cyan-400">star</span>
                 4.9
               </span>
-              <span>Entrega rápida</span>
+              <span>Entrega rapida</span>
             </div>
           </button>
         ))}

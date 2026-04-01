@@ -3,17 +3,44 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import BottomNav from "../components/BottomNav";
 import TopBar from "../components/TopBar";
+import { useBrowserNotifications } from "../features/common/hooks/useBrowserNotifications";
+import { useUserOrderNotifications } from "../features/common/hooks/useUserOrderNotifications";
+import { getCurrentUser } from "../utils/auth";
+
+function readEnderecoSnapshot() {
+  try {
+    const perfil = JSON.parse(localStorage.getItem("perfil") || "null");
+    if (!perfil) return "";
+    return [perfil.endereco, perfil.numero || perfil.numero_endereco, perfil.bairro].filter(Boolean).join(", ");
+  } catch {
+    return "";
+  }
+}
 
 export default function FinalMainLayout() {
-  const [endereco, setEndereco] = useState("");
+  const [endereco, setEndereco] = useState(() => readEnderecoSnapshot());
+  const [currentUser] = useState(() => getCurrentUser());
+  const notifications = useBrowserNotifications();
 
   useEffect(() => {
-    const perfil = JSON.parse(localStorage.getItem("perfil"));
-    if (perfil) {
-      const parts = [perfil.endereco, perfil.numero, perfil.bairro].filter(Boolean);
-      setEndereco(parts.join(", "));
-    }
+    const syncEndereco = () => setEndereco(readEnderecoSnapshot());
+
+    window.addEventListener("storage", syncEndereco);
+    window.addEventListener("auth-changed", syncEndereco);
+    window.addEventListener("profile-changed", syncEndereco);
+
+    return () => {
+      window.removeEventListener("storage", syncEndereco);
+      window.removeEventListener("auth-changed", syncEndereco);
+      window.removeEventListener("profile-changed", syncEndereco);
+    };
   }, []);
+
+  useUserOrderNotifications({
+    userId: currentUser?.id,
+    enabled: notifications.enabled,
+    notify: notifications.notify,
+  });
 
   return (
     <div className="flex w-full h-[100dvh] bg-theme overflow-hidden">

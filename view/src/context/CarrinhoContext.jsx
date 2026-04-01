@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useEffect, useMemo, useState } from "react";
 
 import { getCurrentUser } from "../utils/auth";
@@ -14,26 +15,23 @@ function gerarLinhaKey(item) {
     id: item.id,
     tamanho: item.tamanho || null,
     sabores: item.sabores || [],
+    adicionais: item.adicionais || [],
+    grupos: item.grupos || [],
     obs: item.obs || "",
   });
 }
 
 export function CarrinhoProvider({ children }) {
   const carrinhoKey = useMemo(() => getCarrinhoKey(), []);
-  const [carrinho, setCarrinho] = useState([]);
-
-  useEffect(() => {
+  const [carrinho, setCarrinho] = useState(() => {
     const salvo = localStorage.getItem(carrinhoKey);
-    if (salvo) {
-      try {
-        setCarrinho(JSON.parse(salvo));
-      } catch {
-        setCarrinho([]);
-      }
-    } else {
-      setCarrinho([]);
+    if (!salvo) return [];
+    try {
+      return JSON.parse(salvo);
+    } catch {
+      return [];
     }
-  }, [carrinhoKey]);
+  });
 
   useEffect(() => {
     localStorage.setItem(carrinhoKey, JSON.stringify(carrinho));

@@ -1,9 +1,10 @@
 export default function StoreTabs({ aba, setAba }) {
   const tabs = [
     { key: 'pedidos', label: 'Pedidos' },
+    { key: 'loja', label: 'Dados da loja' },
     { key: 'produtos', label: 'Cadastrar produto' },
-    { key: 'catalogo', label: 'Catálogo' },
-    { key: 'publicacoes', label: 'Publicações' },
+    { key: 'catalogo', label: 'Catalogo' },
+    { key: 'publicacoes', label: 'Publicacoes' },
   ];
 
   return (
@@ -12,8 +13,8 @@ export default function StoreTabs({ aba, setAba }) {
         <button
           key={tab.key}
           onClick={() => setAba(tab.key)}
-          className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap border ${
-            aba === tab.key ? 'bg-red-500 text-white border-red-500' : 'bg-white text-gray-600 border-gray-200'
+          className={`whitespace-nowrap rounded-xl border px-4 py-2 text-sm font-semibold ${
+            aba === tab.key ? 'border-red-500 bg-red-500 text-white' : 'border-gray-200 bg-white text-gray-600'
           }`}
         >
           {tab.label}

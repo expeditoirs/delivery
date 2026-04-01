@@ -1,68 +1,106 @@
-import { useNavigate } from "react-router-dom";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { CarrinhoContext } from "../context/CarrinhoContext";
-import { clearAuth, getCurrentStore, getCurrentUser } from "../utils/auth";
+import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { CarrinhoContext } from '../context/CarrinhoContext';
+import { clearAuth, getCurrentAdmin, getCurrentStore, getCurrentUser } from '../utils/auth';
 
 export default function TopBar({ endereco }) {
   const navigate = useNavigate();
   const { carrinho } = useContext(CarrinhoContext);
-  const [session, setSession] = useState({ user: getCurrentUser(), store: getCurrentStore() });
+  const [session, setSession] = useState({
+    user: getCurrentUser(),
+    store: getCurrentStore(),
+    admin: getCurrentAdmin(),
+  });
 
   useEffect(() => {
-    const sync = () => setSession({ user: getCurrentUser(), store: getCurrentStore() });
-    window.addEventListener("storage", sync);
-    window.addEventListener("auth-changed", sync);
+    const sync = () =>
+      setSession({
+        user: getCurrentUser(),
+        store: getCurrentStore(),
+        admin: getCurrentAdmin(),
+      });
+
+    window.addEventListener('storage', sync);
+    window.addEventListener('auth-changed', sync);
+
     return () => {
-      window.removeEventListener("storage", sync);
-      window.removeEventListener("auth-changed", sync);
+      window.removeEventListener('storage', sync);
+      window.removeEventListener('auth-changed', sync);
     };
   }, []);
 
-  const totalItens = carrinho.reduce((acc, i) => acc + i.qtd, 0);
-  const label = useMemo(() => {
+  const totalItens = carrinho.reduce((acc, item) => acc + item.qtd, 0);
+  const role = session.admin ? 'admin' : session.store ? 'store' : 'user';
+
+  const profileLabel = useMemo(() => {
+    if (session.admin) return session.admin.email;
     if (session.store) return session.store.nome_empresa;
     if (session.user) return session.user.nome;
     return null;
-  }, [session]);
+  }, [session.admin, session.store, session.user]);
+
+  const profileTarget = role === 'admin' ? '/admin' : role === 'store' ? '/loja' : '/perfil';
 
   return (
-    <div className="theme-surface border-b border-theme h-16 flex items-center px-4">
-      <div className="flex items-center justify-between w-full gap-3">
-        <button onClick={() => navigate("/endereco")} className="flex items-center gap-1.5 overflow-hidden max-w-[58%]">
-          <span className="material-icons text-theme-primary text-xl flex-shrink-0">location_on</span>
-          <div className="text-left overflow-hidden">
-            <p className="text-xs text-theme-muted leading-tight">Entregar em</p>
-            <p className="text-sm font-semibold text-slate-100 truncate leading-tight">{endereco || "Defina seu endereço"}</p>
+    <div className="flex h-16 items-center border-b border-theme px-4 theme-surface">
+      <div className="flex w-full items-center justify-between gap-3">
+        {role === 'user' ? (
+          <button onClick={() => navigate('/endereco')} className="flex max-w-[58%] items-center gap-1.5 overflow-hidden">
+            <span className="material-icons text-xl text-theme-primary">location_on</span>
+            <div className="overflow-hidden text-left">
+              <p className="text-xs leading-tight text-theme-muted">Entregar em</p>
+              <p className="theme-title truncate text-sm font-semibold leading-tight">
+                {endereco || 'Defina seu endereço'}
+              </p>
+            </div>
+          </button>
+        ) : (
+          <div className="overflow-hidden">
+            <p className="text-xs leading-tight text-theme-muted">
+              {role === 'admin' ? 'Sessão administrativa' : 'Painel da loja'}
+            </p>
+            <p className="theme-title truncate text-sm font-semibold leading-tight">
+              {profileLabel || (role === 'admin' ? 'Administrador' : 'Loja')}
+            </p>
           </div>
-        </button>
+        )}
 
         <div className="flex items-center gap-1">
-          {label ? (
-            <button onClick={() => (session.store ? navigate("/loja") : navigate("/perfil"))} className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl theme-button-secondary text-xs font-semibold max-w-44 truncate">
+          {profileLabel ? (
+            <button
+              onClick={() => navigate(profileTarget)}
+              className="hidden max-w-44 items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold theme-button-secondary sm:flex"
+            >
               <span className="material-icons text-base text-theme-primary">account_circle</span>
-              <span className="truncate">{label}</span>
+              <span className="truncate">{profileLabel}</span>
             </button>
           ) : null}
 
           <button
             onClick={() => {
-              if (label) {
+              if (profileLabel) {
                 clearAuth();
-                navigate("/login");
+                navigate('/login');
                 return;
               }
-              navigate("/login");
+              navigate('/login');
             }}
-            className="p-2 text-slate-300"
-            title={label ? "Sair" : "Entrar"}
+            className="p-2 theme-muted"
+            title={profileLabel ? 'Sair' : 'Entrar'}
           >
-            <span className="material-icons text-[22px]">{label ? "logout" : "login"}</span>
+            <span className="material-icons text-[22px]">{profileLabel ? 'logout' : 'login'}</span>
           </button>
 
-          <button onClick={() => navigate("/carrinho")} className="relative p-2">
-            {totalItens > 0 && <span className="absolute top-0.5 right-0.5 bg-cyan-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center font-bold leading-none">{totalItens}</span>}
-            <span className="material-icons text-slate-200">shopping_bag</span>
-          </button>
+          {role === 'user' ? (
+            <button onClick={() => navigate('/carrinho')} className="relative p-2">
+              {totalItens > 0 ? (
+                <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-cyan-500 text-xs font-bold leading-none text-white">
+                  {totalItens}
+                </span>
+              ) : null}
+              <span className="material-icons theme-title">shopping_bag</span>
+            </button>
+          ) : null}
         </div>
       </div>
     </div>

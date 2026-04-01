@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { fetchOrderItems } from '../services/storeOrdersService';
+import { printDispatchTicket, printKitchenTicket } from '../utils/printOrder';
 import { money } from './storeUtils';
 
 const COLUMNS = [
@@ -15,6 +17,10 @@ function normalizeStatus(status) {
   return value;
 }
 
+function isDelivery(order) {
+  return Boolean(order?.endereco_rua || order?.endereco_bairro || order?.endereco_cidade);
+}
+
 export default function StoreOrdersBoard({
   cardClass,
   orders,
@@ -26,6 +32,7 @@ export default function StoreOrdersBoard({
   onChangeStatus,
 }) {
   const [savingId, setSavingId] = useState(null);
+  const [printingKey, setPrintingKey] = useState('');
 
   const grouped = useMemo(() => {
     const map = Object.fromEntries(COLUMNS.map((col) => [col.key, []]));
@@ -45,12 +52,30 @@ export default function StoreOrdersBoard({
     }
   }
 
+  async function handlePrint(order, mode) {
+    const key = `${mode}-${order.id}`;
+    setPrintingKey(key);
+    try {
+      const items = await fetchOrderItems(order.id);
+      if (mode === 'kitchen') {
+        printKitchenTicket(order, items);
+        return;
+      }
+      printDispatchTicket(order, items);
+    } catch (error) {
+      console.error(error);
+      window.alert('Nao foi possivel preparar a impressao deste pedido.');
+    } finally {
+      setPrintingKey('');
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className={`${cardClass} flex flex-col md:flex-row md:items-center md:justify-between gap-3`}>
         <div>
           <h2 className="text-base font-bold text-gray-900">Pedidos da loja</h2>
-          <p className="text-sm text-gray-400 mt-1">Painel operacional com atualização por consulta periódica.</p>
+          <p className="text-sm text-gray-400 mt-1">Painel operacional com atualização em tempo real e fallback leve.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className={`text-xs font-semibold px-3 py-2 rounded-full border ${enabled ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
@@ -82,6 +107,22 @@ export default function StoreOrdersBoard({
                     <p>{order.total_itens || 0} item(ns)</p>
                     <p>{order.data_pedido ? new Date(order.data_pedido).toLocaleString('pt-BR') : 'Sem data'}</p>
                     {(order.endereco_bairro || order.endereco_rua) && <p>{[order.endereco_rua, order.endereco_numero, order.endereco_bairro].filter(Boolean).join(', ')}</p>}
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handlePrint(order, 'kitchen')}
+                      disabled={Boolean(printingKey)}
+                      className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold disabled:opacity-60"
+                    >
+                      {printingKey === `kitchen-${order.id}` ? 'Preparando...' : 'Imprimir cozinha'}
+                    </button>
+                    <button
+                      onClick={() => handlePrint(order, 'dispatch')}
+                      disabled={Boolean(printingKey)}
+                      className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold disabled:opacity-60"
+                    >
+                      {printingKey === `dispatch-${order.id}` ? 'Preparando...' : `Imprimir ${isDelivery(order) ? 'entrega' : 'retirada'}`}
+                    </button>
                   </div>
                   <button
                     onClick={() => handleAdvance(order.id, column.nextStatus)}

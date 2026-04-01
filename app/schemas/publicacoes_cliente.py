@@ -27,3 +27,4 @@ class PublicacaoFeedRead(PublicacaoClienteRead):
     empresa_nome: Optional[str] = None
     id_empresa: Optional[int] = None
     total_pedido: Optional[float] = None
+    feed_score: Optional[float] = None

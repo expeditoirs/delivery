@@ -40,6 +40,14 @@ def set_json(key: str, value, ex: int = 120):
     return True
 
 
+def publish_json(channel: str, value) -> bool:
+    client = get_redis_client()
+    if not client:
+        return False
+    client.publish(channel, json.dumps(jsonable_encoder(value), ensure_ascii=False))
+    return True
+
+
 def invalidate_prefix(prefix: str):
     client = get_redis_client()
     if not client:

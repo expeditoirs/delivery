@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.cache import cached, invalidate_prefix
@@ -22,11 +22,12 @@ def criar_story(data: StoryEmpresaCreate, db: Session = Depends(get_db)):
 
 @router.get('/', response_model=list[StoryFeedRead])
 @cached('feed:stories', ttl=90)
-def listar_stories(db: Session = Depends(get_db)):
+def listar_stories(limit: int = Query(default=20, ge=1, le=100), db: Session = Depends(get_db)):
     rows = (
         db.query(StoryEmpresa, Empresa)
         .join(Empresa, Empresa.id == StoryEmpresa.id_empresa)
         .order_by(StoryEmpresa.criado_em.desc())
+        .limit(limit)
         .all()
     )
     return [

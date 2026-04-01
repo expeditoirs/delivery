@@ -72,12 +72,12 @@ export default function PostActions({
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-3 text-gray-600">
+      <div className="flex items-center gap-4 mb-3 text-theme-muted">
         <button
           type="button"
           onClick={onToggleLike}
           className={`flex items-center gap-1 transition-colors ${
-            liked ? "text-red-500" : "text-gray-600"
+            liked ? "text-theme-accent" : "text-theme-muted hover:text-theme-text"
           }`}
         >
           <span className="material-icons">
@@ -89,7 +89,7 @@ export default function PostActions({
         <button
           type="button"
           onClick={onOpenComments}
-          className="flex items-center gap-1 text-gray-600"
+          className="flex items-center gap-1 text-theme-muted hover:text-theme-text transition-colors"
         >
           <span className="material-icons">chat_bubble_outline</span>
           <span className="text-xs font-medium">Comentar</span>
@@ -98,15 +98,15 @@ export default function PostActions({
         <button
           type="button"
           onClick={handleShare}
-          className="flex items-center gap-1 text-gray-600"
+          className="flex items-center gap-1 text-theme-muted hover:text-theme-text transition-colors"
         >
           <span className="material-icons">send</span>
           <span className="text-xs font-medium">Enviar</span>
         </button>
       </div>
 
-      <div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
-        <span className="font-semibold text-gray-700">
+      <div className="flex items-center gap-4 text-xs text-theme-muted mb-2">
+        <span className="font-semibold text-theme-text">
           {likesCount} curtidas
         </span>
         <span>{commentsCount} comentários</span>

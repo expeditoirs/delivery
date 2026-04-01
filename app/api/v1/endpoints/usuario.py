@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.security import criar_token, get_current_user_id, require_user
 from app.dependencies import get_db
 from app.repositories import usuario_repo
+from app.schemas.auth import PasswordResetRequest
 from app.schemas.usuario import LoginRequest, UsuarioAuthResponse, UsuarioCreate, UsuarioResponse, UsuarioUpdate
 
 router = APIRouter()
@@ -13,7 +14,7 @@ router = APIRouter()
 def criar(usuario: UsuarioCreate, db: Session = Depends(get_db)):
     existing = usuario_repo.buscar_por_email(db, usuario.email)
     if existing:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email já cadastrado')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email ja cadastrado')
     return usuario_repo.criar_usuario(db, usuario)
 
 
@@ -25,11 +26,18 @@ def login(dados: LoginRequest, db: Session = Depends(get_db)):
     return UsuarioAuthResponse(access_token=criar_token(user.id, 'user'), usuario=user)
 
 
+@router.post('/reset-senha', status_code=status.HTTP_204_NO_CONTENT)
+def resetar_senha(dados: PasswordResetRequest, db: Session = Depends(get_db)):
+    usuario = usuario_repo.atualizar_senha_por_email(db, dados.email, dados.nova_senha)
+    if not usuario:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuario nao encontrado')
+
+
 @router.get('/me', response_model=UsuarioResponse)
 def me(_: dict = Depends(require_user), user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     usuario = usuario_repo.buscar_usuario(db, user_id)
     if not usuario:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuario nao encontrado')
     return usuario
 
 
@@ -37,7 +45,7 @@ def me(_: dict = Depends(require_user), user_id: int = Depends(get_current_user_
 def atualizar_me(data: UsuarioUpdate, _: dict = Depends(require_user), user_id: int = Depends(get_current_user_id), db: Session = Depends(get_db)):
     usuario = usuario_repo.atualizar_usuario(db, user_id, data.model_dump(exclude_none=True))
     if not usuario:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuario nao encontrado')
     return usuario
 
 
@@ -50,5 +58,5 @@ def listar(db: Session = Depends(get_db)):
 def buscar(user_id: int, db: Session = Depends(get_db)):
     usuario = usuario_repo.buscar_usuario(db, user_id)
     if not usuario:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuário não encontrado')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Usuario nao encontrado')
     return usuario

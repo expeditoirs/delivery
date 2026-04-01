@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../core/api";
 import { listarPublicacoes } from "../../services/publicacoesService";
+import { formatStoreCategories } from "../../utils/storeCategories";
 
 export default function PerfilLoja() {
   const { id } = useParams();
@@ -36,7 +37,7 @@ export default function PerfilLoja() {
           </button>
           <div>
             <h1 className="text-lg font-bold text-gray-900">Perfil da loja</h1>
-            <p className="text-xs text-gray-400">Marca, cardápio e prova social</p>
+            <p className="text-xs text-gray-400">Marca, cardapio e prova social</p>
           </div>
         </div>
       </div>
@@ -47,7 +48,7 @@ export default function PerfilLoja() {
             <span className="material-icons text-4xl">storefront</span>
           </div>
           <h2 className="text-2xl font-black">{empresa?.nome_empresa || "Loja"}</h2>
-          <p className="text-sm text-white/80 mt-1">{empresa?.categoria_empresa || "Especialidade da casa"}</p>
+          <p className="text-sm text-white/80 mt-1">{formatStoreCategories(empresa, "Especialidade da casa")}</p>
           <div className="grid grid-cols-3 gap-3 mt-5 text-center">
             <div className="rounded-2xl bg-white/10 p-3">
               <p className="text-lg font-black">4.9</p>
@@ -63,18 +64,18 @@ export default function PerfilLoja() {
             </div>
           </div>
           <button onClick={() => navigate(`/cardapio/${id}`)} className="mt-5 w-full bg-white text-red-500 py-3.5 rounded-2xl font-bold">
-            Ver cardápio
+            Ver cardapio
           </button>
         </section>
 
         <section className="bg-white rounded-[28px] border border-gray-100 shadow-sm p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-bold text-gray-900">Prova social da loja</h3>
-            <span className="text-xs text-gray-400">Publicações reais</span>
+            <span className="text-xs text-gray-400">Publicacoes reais</span>
           </div>
 
           {loading && <div className="text-sm text-gray-400">Carregando...</div>}
-          {!loading && !postsDaLoja.length && <div className="text-sm text-gray-400">Ainda não há posts aprovados para esta loja.</div>}
+          {!loading && !postsDaLoja.length && <div className="text-sm text-gray-400">Ainda nao ha posts aprovados para esta loja.</div>}
 
           <div className="space-y-3">
             {postsDaLoja.map((post) => (

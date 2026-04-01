@@ -1,55 +1,129 @@
+import { useMemo, useState } from 'react';
 import { money } from './storeUtils';
 
-export default function StoreCatalog({ cardClass, itens, categorias, excluirItem, navigateToCardapio }) {
+export default function StoreCatalog({ cardClass, itens, categorias, excluirItem, onToggleAvailability, busyItemId, navigateToCardapio }) {
+  const [busca, setBusca] = useState('');
+
+  const itensFiltrados = useMemo(() => {
+    const termo = busca.trim().toLowerCase();
+    if (!termo) return itens;
+    return itens.filter((item) =>
+      String(item.nome || '').toLowerCase().includes(termo) ||
+      String(item.descricao || '').toLowerCase().includes(termo)
+    );
+  }, [busca, itens]);
+
   return (
-    <div className={`${cardClass} space-y-4`}>
-      <div className="flex items-center justify-between gap-3">
+    <div className={`${cardClass} space-y-5`}>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h2 className="text-base font-bold text-gray-900">Catálogo da loja</h2>
-          <p className="text-sm text-gray-400 mt-1">Veja os produtos cadastrados e remova itens quando necessário.</p>
+          <h2 className="text-lg font-black text-slate-900">Catalogo da loja</h2>
+          <p className="mt-1 text-sm text-slate-500">Pesquise itens, acompanhe disponibilidade e entre rapido na vitrine.</p>
         </div>
-        <button onClick={navigateToCardapio} className="px-4 py-2 rounded-xl bg-red-50 text-red-600 font-semibold text-sm">Ver vitrine</button>
+
+        <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+          <div className="relative flex-1 sm:min-w-[280px]">
+            <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input
+              value={busca}
+              onChange={(event) => setBusca(event.target.value)}
+              placeholder="Buscar item por nome ou descricao"
+              className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-sm outline-none transition focus:border-orange-300 focus:ring-2 focus:ring-orange-100"
+            />
+          </div>
+          <button onClick={navigateToCardapio} className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">Abrir vitrine</button>
+        </div>
       </div>
-      <div className="space-y-3">
-        {itens.map((item) => {
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        {itensFiltrados.map((item) => {
           const config = item.configuracao || {};
           const tamanhos = config.tamanhos || [];
           const adicionais = config.adicionais || [];
           const grupos = config.grupos_opcoes || [];
+          const isBusy = busyItemId === item.id;
+          const categoriaNome = categorias.find((c) => c.id === item.id_categoria)?.nome || (item.id_categoria ? `Categoria #${item.id_categoria}` : 'Sem categoria');
+          const precoResumo = !tamanhos.length
+            ? money(item.preco)
+            : (() => {
+                const precos = tamanhos.map((t) => Number(t.preco || 0));
+                const min = Math.min(...precos);
+                const max = Math.max(...precos);
+                return min === max ? money(min) : `${money(min)} ate ${money(max)}`;
+              })();
+
           return (
-            <div key={item.id} className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-bold text-sm text-gray-900 break-words">{item.nome}</p>
-                  <p className="text-xs text-gray-500 mt-1">{item.descricao || 'Sem descrição'}</p>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {item.id_categoria && <span className="px-2 py-1 rounded-full bg-white border text-xs font-semibold text-gray-600">{categorias.find((c) => c.id === item.id_categoria)?.nome || `Categoria #${item.id_categoria}`}</span>}
+            <article key={item.id} className="overflow-hidden rounded-[28px] border border-slate-100 bg-slate-50/90 shadow-[0_16px_40px_rgba(15,23,42,0.04)]">
+              <div className="grid gap-0 md:grid-cols-[180px_1fr]">
+                <div className="relative min-h-[180px] bg-[linear-gradient(135deg,rgba(251,146,60,0.12),rgba(239,68,68,0.08))]">
+                  {item.img ? (
+                    <img src={item.img} alt={item.nome} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-slate-400">
+                      <span className="material-icons text-5xl">fastfood</span>
+                    </div>
+                  )}
+                  <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                    {categoriaNome}
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-sm font-bold text-red-500">
-                    {!tamanhos.length ? money(item.preco) : (() => {
-                      const precos = tamanhos.map((t) => Number(t.preco || 0));
-                      const min = Math.min(...precos);
-                      const max = Math.max(...precos);
-                      return min === max ? money(min) : `${money(min)} até ${money(max)}`;
-                    })()}
-                  </p>
-                  <button onClick={() => excluirItem(item.id)} className="mt-2 text-xs font-semibold text-red-500">Excluir</button>
+
+                <div className="p-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base font-black text-slate-900">{item.nome}</h3>
+                        <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${item.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
+                          {item.ativo ? 'Disponivel' : 'Indisponivel'}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">{item.descricao || 'Produto sem descricao cadastrada.'}</p>
+                    </div>
+
+                    <div className="rounded-2xl bg-white px-4 py-3 text-right shadow-sm">
+                      <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Preco</p>
+                      <p className="mt-1 text-base font-black text-orange-600">{precoResumo}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl bg-white p-3 shadow-sm">
+                      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Tamanhos</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-700">{tamanhos.length || 0}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-3 shadow-sm">
+                      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Adicionais</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-700">{adicionais.length || 0}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-3 shadow-sm">
+                      <p className="text-[11px] uppercase tracking-[0.16em] text-slate-400">Grupos</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-700">{grupos.length || 0}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onToggleAvailability?.(item)}
+                      disabled={isBusy}
+                      className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${item.ativo ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} disabled:opacity-60`}
+                    >
+                      {isBusy ? 'Salvando...' : item.ativo ? 'Marcar indisponivel' : 'Reativar item'}
+                    </button>
+                    <button onClick={() => excluirItem(item.id)} className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-100">Excluir item</button>
+                  </div>
                 </div>
               </div>
-              {(tamanhos.length > 0 || adicionais.length > 0 || grupos.length > 0) && (
-                <div className="grid md:grid-cols-3 gap-3">
-                  <div className="rounded-2xl bg-white border border-gray-100 p-3"><p className="text-xs font-bold text-gray-700 mb-2">Tamanhos</p>{tamanhos.length ? <div className="space-y-1">{tamanhos.map((t, i) => <p key={i} className="text-xs text-gray-500">{t.nome} — {money(t.preco)}</p>)}</div> : <p className="text-xs text-gray-400">Sem tamanhos</p>}</div>
-                  <div className="rounded-2xl bg-white border border-gray-100 p-3"><p className="text-xs font-bold text-gray-700 mb-2">Adicionais</p>{adicionais.length ? <div className="space-y-1">{adicionais.map((a, i) => <p key={i} className="text-xs text-gray-500">{a.nome} — {money(a.preco)}</p>)}</div> : <p className="text-xs text-gray-400">Sem adicionais</p>}</div>
-                  <div className="rounded-2xl bg-white border border-gray-100 p-3"><p className="text-xs font-bold text-gray-700 mb-2">Grupos</p>{grupos.length ? <div className="space-y-1">{grupos.map((g, i) => <p key={i} className="text-xs text-gray-500">{g.nome} — min {g.min} / max {g.max}{g.tipo_grupo === 'sabores' ? ` • ${g.regra_preco === 'maior_preco' ? 'maior preço' : 'soma proporcional'}` : ''}</p>)}</div> : <p className="text-xs text-gray-400">Sem grupos</p>}</div>
-                </div>
-              )}
-            </div>
+            </article>
           );
         })}
-        {!itens.length && <div className="text-sm text-gray-400">Nenhum item cadastrado ainda.</div>}
       </div>
+
+      {!itensFiltrados.length && (
+        <div className="rounded-[28px] border border-dashed border-slate-200 px-4 py-10 text-center text-sm text-slate-400">
+          Nenhum item encontrado para esse filtro.
+        </div>
+      )}
     </div>
   );
 }

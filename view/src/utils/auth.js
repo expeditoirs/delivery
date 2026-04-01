@@ -38,6 +38,20 @@ export function getCurrentAdmin() {
   return getStoredAuth()?.administrador || null;
 }
 
+export function getCurrentSessionProfileKey() {
+  const auth = getStoredAuth();
+  if (auth?.administrador) {
+    return `admin_${auth.administrador.id || auth.administrador.email || 'atual'}`;
+  }
+  if (auth?.empresa) {
+    return `store_${auth.empresa.id || 'atual'}`;
+  }
+  if (auth?.usuario) {
+    return `user_${auth.usuario.id || 'atual'}`;
+  }
+  return 'global';
+}
+
 export function isAuthenticated() {
   return Boolean(getAccessToken() && getStoredAuth());
 }

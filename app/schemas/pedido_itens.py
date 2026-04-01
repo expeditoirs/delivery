@@ -12,6 +12,7 @@ class PedidoItemBase(BaseModel):
     observacao: Optional[str] = None
     tamanho: Optional[str] = None
     sabores: Optional[list[str]] = None
+    complementos: Optional[dict] = None
 
 
 class PedidoItemCreate(PedidoItemBase):

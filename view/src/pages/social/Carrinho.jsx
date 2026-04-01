@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import api from "../../core/api";
@@ -14,20 +14,19 @@ export default function Carrinho() {
   const navigate = useNavigate();
   const { carrinho, aumentar, diminuir, remover, limpar } = useContext(CarrinhoContext);
   const perfilKey = useMemo(() => getPerfilKey(), []);
-  const [endereco, setEndereco] = useState("");
-  const [perfilEntrega, setPerfilEntrega] = useState(null);
-
-  useEffect(() => {
+  const perfilEntrega = useMemo(() => {
     const perfil = JSON.parse(localStorage.getItem(perfilKey) || localStorage.getItem("perfil") || "{}");
-    const parts = [
-      perfil.endereco,
-      perfil.numero,
-      perfil.bairro,
-      perfil.cidade && perfil.estado ? `${perfil.cidade}/${perfil.estado}` : perfil.cidade,
-    ].filter(Boolean);
-    setPerfilEntrega(perfil);
-    setEndereco(parts.join(", "));
+    return perfil;
   }, [perfilKey]);
+
+  const endereco = useMemo(() => {
+    return [
+      perfilEntrega?.endereco,
+      perfilEntrega?.numero,
+      perfilEntrega?.bairro,
+      perfilEntrega?.cidade && perfilEntrega?.estado ? `${perfilEntrega.cidade}/${perfilEntrega.estado}` : perfilEntrega?.cidade,
+    ].filter(Boolean).join(", ");
+  }, [perfilEntrega]);
 
   const total = carrinho.reduce((acc, item) => acc + Number(item.preco) * item.qtd, 0);
 
@@ -64,6 +63,10 @@ export default function Carrinho() {
           observacao: item.obs || null,
           tamanho: item.tamanho || null,
           sabores: item.sabores || [],
+          complementos: {
+            adicionais: item.adicionais || [],
+            grupos: item.grupos || [],
+          },
         })),
       });
       limpar();
@@ -74,57 +77,162 @@ export default function Carrinho() {
   }
 
   if (!carrinho.length) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full py-20 text-gray-400 px-8">
-        <span className="material-icons text-7xl mb-4 text-gray-200">shopping_bag</span>
-        <h2 className="text-lg font-bold text-gray-600 mb-1">Carrinho vazio</h2>
-        <p className="text-sm text-center text-gray-400 mb-6">Adicione itens do cardápio para continuar</p>
-        <button onClick={() => navigate("/")} className="bg-red-500 text-white px-6 py-3 rounded-2xl font-semibold">Ver restaurantes</button>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col h-[100dvh] bg-gray-50">
-      <div className="bg-white px-4 pt-4 pb-3 border-b border-gray-100 flex-shrink-0">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-gray-500 mb-2"><span className="material-icons text-xl">arrow_back</span><span className="text-sm">Voltar</span></button>
-        <h1 className="font-bold text-xl text-gray-900">Meu pedido</h1>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-4">
-        {carrinho.map((item) => (
-          <div key={item.linhaKey} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm text-gray-900 truncate">{item.nome}</h3>
-                {item.tamanho && <p className="text-xs text-gray-500 mt-0.5">Tamanho: {item.tamanho}</p>}
-                {item.sabores?.length > 0 && <p className="text-xs text-gray-500 mt-0.5">Sabores: {item.sabores.join(", ")}</p>}
-                {item.obs && <p className="text-xs text-gray-400 mt-0.5">Obs: {item.obs}</p>}
-                <p className="text-xs text-gray-400 mt-0.5">R$ {Number(item.preco).toFixed(2)} un.</p>
-              </div>
-              <button onClick={() => remover(item.linhaKey)} className="text-gray-300 hover:text-red-400 ml-3 flex-shrink-0"><span className="material-icons text-xl">delete_outline</span></button>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-1">
-                <button onClick={() => diminuir(item.linhaKey)} className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center font-bold text-gray-600">−</button>
-                <span className="text-sm font-bold w-5 text-center">{item.qtd}</span>
-                <button onClick={() => aumentar(item.linhaKey)} className="w-8 h-8 bg-red-500 rounded-lg text-white flex items-center justify-center font-bold">+</button>
-              </div>
-              <span className="font-bold text-red-500">R$ {(Number(item.preco) * item.qtd).toFixed(2)}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex-shrink-0 bg-white border-t border-gray-100 p-4 space-y-3">
-        <button onClick={() => navigate("/endereco")} className="w-full flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 text-left">
-          <span className="material-icons text-red-500 flex-shrink-0">location_on</span>
-          <div className="flex-1 min-w-0"><p className="text-xs text-gray-400">Entregar em</p><p className="text-sm font-semibold text-gray-800 truncate">{endereco || "Defina seu endereço"}</p></div>
-        </button>
-        <div className="flex justify-between items-center px-1"><span className="text-gray-600 font-medium">Total</span><span className="font-bold text-xl text-red-500">R$ {total.toFixed(2)}</span></div>
-        <button className="w-full bg-red-500 text-white py-4 rounded-2xl font-bold text-base" onClick={finalizarPedido}>Finalizar pedido</button>
-        <button className="w-full text-gray-400 text-sm py-1" onClick={limpar}>Limpar carrinho</button>
-      </div>
+    <div className="flex flex-col items-center justify-center h-full py-20 px-8 bg-theme-background text-theme-muted">
+      <span className="material-icons text-7xl mb-4 text-theme-secondary/60">
+        shopping_bag
+      </span>
+      <h2 className="text-lg font-bold text-theme-text mb-1">
+        Carrinho vazio
+      </h2>
+      <p className="text-sm text-center text-theme-muted mb-6">
+        Adicione itens do cardápio para continuar
+      </p>
+      <button
+        onClick={() => navigate("/")}
+        className="bg-theme-primary text-white px-6 py-3 rounded-2xl font-semibold hover:bg-theme-accent transition-colors"
+      >
+        Ver restaurantes
+      </button>
     </div>
   );
 }
+
+return (
+  <div className="flex flex-col h-[100dvh] bg-theme-background">
+    <div className="bg-theme-surface px-4 pt-4 pb-3 border-b border-theme-border flex-shrink-0">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-1 text-theme-muted mb-2 hover:text-theme-text transition-colors"
+      >
+        <span className="material-icons text-xl">arrow_back</span>
+        <span className="text-sm">Voltar</span>
+      </button>
+
+      <h1 className="font-bold text-xl text-theme-text">Meu pedido</h1>
+    </div>
+
+    <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-4">
+      {carrinho.map((item) => (
+        <div
+          key={item.linhaKey}
+          className="bg-theme-surface rounded-2xl p-4 border border-theme-border shadow-sm"
+        >
+          <div className="flex justify-between items-start mb-3">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm text-theme-text truncate">
+                {item.nome}
+              </h3>
+
+              {item.tamanho && (
+                <p className="text-xs text-theme-muted mt-0.5">
+                  Tamanho: {item.tamanho}
+                </p>
+              )}
+
+              {item.sabores?.length > 0 && (
+                <p className="text-xs text-theme-muted mt-0.5">
+                  Sabores: {item.sabores.join(", ")}
+                </p>
+              )}
+
+              {item.adicionais?.length > 0 && (
+                <p className="text-xs text-theme-muted mt-0.5">
+                  Adicionais: {item.adicionais.map((extra) => `${extra.nome}${extra.quantidade > 1 ? ` x${extra.quantidade}` : ""}`).join(", ")}
+                </p>
+              )}
+
+              {item.grupos?.length > 0 && item.grupos.map((grupo) => (
+                <p key={grupo.grupo_nome} className="text-xs text-theme-muted mt-0.5">
+                  {grupo.grupo_nome}: {(grupo.itens || []).map((opcao) => opcao.nome).join(", ")}
+                </p>
+              ))}
+
+              {item.obs && (
+                <p className="text-xs text-theme-muted mt-0.5">
+                  Obs: {item.obs}
+                </p>
+              )}
+
+              <p className="text-xs text-theme-muted mt-0.5">
+                R$ {Number(item.preco).toFixed(2)} un.
+              </p>
+            </div>
+
+            <button
+              onClick={() => remover(item.linhaKey)}
+              className="text-theme-muted hover:text-theme-accent ml-3 flex-shrink-0 transition-colors"
+            >
+              <span className="material-icons text-xl">delete_outline</span>
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 bg-theme-hover rounded-xl p-1 border border-theme-border">
+              <button
+                onClick={() => diminuir(item.linhaKey)}
+                className="w-8 h-8 bg-theme-surface rounded-lg border border-theme-border flex items-center justify-center font-bold text-theme-text"
+              >
+                −
+              </button>
+
+              <span className="text-sm font-bold w-5 text-center text-theme-text">
+                {item.qtd}
+              </span>
+
+              <button
+                onClick={() => aumentar(item.linhaKey)}
+                className="w-8 h-8 bg-theme-primary rounded-lg text-white flex items-center justify-center font-bold hover:bg-theme-accent transition-colors"
+              >
+                +
+              </button>
+            </div>
+
+            <span className="font-bold text-theme-primary">
+              R$ {(Number(item.preco) * item.qtd).toFixed(2)}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="flex-shrink-0 bg-theme-surface border-t border-theme-border p-4 space-y-3">
+      <button
+        onClick={() => navigate("/endereco")}
+        className="w-full flex items-center gap-3 bg-theme-hover p-3 rounded-xl border border-theme-border text-left"
+      >
+        <span className="material-icons text-theme-primary flex-shrink-0">
+          location_on
+        </span>
+
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-theme-muted">Entregar em</p>
+          <p className="text-sm font-semibold text-theme-text truncate">
+            {endereco || "Defina seu endereço"}
+          </p>
+        </div>
+      </button>
+
+      <div className="flex justify-between items-center px-1">
+        <span className="text-theme-muted font-medium">Total</span>
+        <span className="font-bold text-xl text-theme-primary">
+          R$ {total.toFixed(2)}
+        </span>
+      </div>
+
+      <button
+        className="w-full bg-theme-primary text-white py-4 rounded-2xl font-bold text-base hover:bg-theme-accent transition-colors"
+        onClick={finalizarPedido}
+      >
+        Finalizar pedido
+      </button>
+
+      <button
+        className="w-full text-theme-muted text-sm py-1 hover:text-theme-text transition-colors"
+        onClick={limpar}
+      >
+        Limpar carrinho
+      </button>
+    </div>
+  </div>
+);}

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
+from passlib.exc import UnknownHashError
 
 from app.models.usuario import Usuario
 
@@ -11,7 +12,12 @@ def hash_senha(senha: str) -> str:
 
 
 def verificar_senha(senha: str, senha_hash: str) -> bool:
-    return _pwd.verify(senha, senha_hash)
+    if not senha_hash:
+        return False
+    try:
+        return _pwd.verify(senha, senha_hash)
+    except (ValueError, TypeError, UnknownHashError):
+        return senha == senha_hash
 
 
 def criar_usuario(db: Session, usuario):
@@ -30,13 +36,29 @@ def buscar_por_email(db: Session, email: str):
 
 def login_usuario(db: Session, email: str, senha: str):
     user = buscar_por_email(db, email)
-    if not user or not verificar_senha(senha, user.senha):
+    if not user or not user.senha or not verificar_senha(senha, user.senha):
         return None
+    try:
+        if not _pwd.identify(user.senha):
+            user.senha = hash_senha(senha)
+            db.commit()
+            db.refresh(user)
+    except (ValueError, TypeError):
+        user.senha = hash_senha(senha)
+        db.commit()
+        db.refresh(user)
     return user
 
 
-def listar_usuarios(db: Session):
-    return db.query(Usuario).all()
+def listar_usuarios(db: Session, offset: int = 0, limit: int | None = None):
+    query = db.query(Usuario).order_by(Usuario.id.desc()).offset(offset)
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
+
+
+def contar_usuarios(db: Session) -> int:
+    return db.query(Usuario).count()
 
 
 def buscar_usuario(db: Session, user_id: int):
@@ -50,6 +72,16 @@ def atualizar_usuario(db: Session, user_id: int, data: dict):
     for key, value in data.items():
         if value is not None and hasattr(user, key):
             setattr(user, key, value)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def atualizar_senha_por_email(db: Session, email: str, nova_senha: str):
+    user = buscar_por_email(db, email)
+    if not user:
+        return None
+    user.senha = hash_senha(nova_senha)
     db.commit()
     db.refresh(user)
     return user

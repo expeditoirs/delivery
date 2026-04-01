@@ -3,9 +3,12 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 
 import HomeFeed from "./pages/social/HomeFeed";
-import Perfil from "./pages/social/Perfil";
+import Perfil from "./pages/profile/Perfil";
 import MeusPedidos from "./pages/social/MeusPedidos";
-import Endereco from "./pages/social/Endereco";
+import Endereco from "./pages/profile/Endereco";
+import EditarDados from "./pages/profile/EditarDados";
+import Configuracoes from "./pages/profile/Configuracoes";
+import Favoritos from "./pages/profile/Favoritos";
 import Carrinho from "./pages/social/Carrinho";
 import Cardapio from "./pages/social/Cardapio";
 import Produto from "./pages/social/Produto";
@@ -15,7 +18,11 @@ import Register from "./pages/Register";
 import LojaDashboard from "./pages/store/LojaDashboard";
 import PerfilUsuario from "./pages/social/PerfilUsuario";
 import PerfilLoja from "./pages/social/PerfilLoja";
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminNeighborhoods from "./pages/admin/AdminNeighborhoods";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminStores from "./pages/admin/AdminStores";
 import HomeStore from "./pages/social/HomeStore";
 import PublicacaoDetalhe from "./pages/social/PublicacaoDetalhe";
 
@@ -53,6 +60,9 @@ function App() {
             <Route path="/publicacao/:id" element={<PublicacaoDetalhe />} />
             <Route path="/meuspedidos" element={<MeusPedidos />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/perfil/dados" element={<EditarDados />} />
+            <Route path="/perfil/favoritos" element={<Favoritos />} />
+            <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/perfil/usuario/:id" element={<PerfilUsuario />} />
             <Route path="/perfil/loja/:id" element={<PerfilLoja />} />
             <Route path="/endereco" element={<Endereco />} />
@@ -70,7 +80,13 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<LojaDashboard />} />
+            <Route index element={<LojaDashboard section="overview" />} />
+            <Route path="pedidos" element={<LojaDashboard section="orders" />} />
+            <Route path="produtos" element={<LojaDashboard section="products" />} />
+            <Route path="clientes" element={<LojaDashboard section="customers" />} />
+            <Route path="horarios" element={<LojaDashboard section="hours" />} />
+            <Route path="configuracoes" element={<LojaDashboard section="settings" />} />
+            <Route path="produtos/cadastrar" element={<Navigate to="/loja/produtos" replace />} />
           </Route>
 
           <Route
@@ -82,6 +98,9 @@ function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="lojas" element={<AdminStores />} />
+            <Route path="bairros" element={<AdminNeighborhoods />} />
+            <Route path="pedidos" element={<AdminOrders />} />
           </Route>
 
           <Route path="/login" element={<Login />} />

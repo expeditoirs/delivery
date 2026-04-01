@@ -1,7 +1,63 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../core/api';
-import { saveAuth } from '../utils/auth';
+import { getCurrentAdmin, getCurrentStore, getCurrentUser, saveAuth } from '../utils/auth';
+
+const LOGIN_OPTIONS = [
+  {
+    key: 'user',
+    label: 'Cliente',
+    subtitle: 'Entrar como usuario do app',
+  },
+  {
+    key: 'store',
+    label: 'Loja',
+    subtitle: 'Entrar no painel da loja',
+  },
+  {
+    key: 'admin',
+    label: 'Admin',
+    subtitle: 'Entrar no painel administrativo',
+  },
+];
+
+const LOGIN_CONFIG = {
+  user: {
+    endpoint: '/usuario/login',
+    navigateTo: '/',
+    buildAuth: (data) => ({ access_token: data.access_token, usuario: data.usuario }),
+    fallbackMessage: 'Email ou senha do usuario incorretos.',
+  },
+  store: {
+    endpoint: '/empresa/login',
+    navigateTo: '/loja',
+    buildAuth: (data) => ({ access_token: data.access_token, empresa: data.empresa }),
+    fallbackMessage: 'Email ou senha da loja incorretos.',
+  },
+  admin: {
+    endpoint: '/admin/login',
+    navigateTo: '/admin',
+    buildAuth: (data) => ({ access_token: data.access_token, administrador: data.administrador }),
+    fallbackMessage: 'Email ou senha do administrador incorretos.',
+  },
+};
+
+function LoginOptionButton({ active, label, subtitle, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-2xl border px-3 py-3 text-left transition-colors ${
+        active
+          ? 'border-theme bg-white/10 theme-title'
+          : 'border-theme theme-glass text-theme-muted hover:bg-white/10'
+      }`}
+    >
+      <p className="text-sm font-semibold">{label}</p>
+      <p className="mt-1 text-xs">{subtitle}</p>
+    </button>
+  );
+}
 
 export default function Login() {
   const navigate = useNavigate();
@@ -9,66 +65,100 @@ export default function Login() {
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loginType, setLoginType] = useState('user');
 
-  async function tentarLoginUsuario() {
-    const { data } = await api.post('/usuario/login', { email, senha });
-    saveAuth({ access_token: data.access_token, usuario: data.usuario });
-    navigate('/');
-  }
+  useEffect(() => {
+    if (getCurrentAdmin()) navigate('/admin', { replace: true });
+    else if (getCurrentStore()) navigate('/loja', { replace: true });
+    else if (getCurrentUser()) navigate('/', { replace: true });
+  }, [navigate]);
 
-  async function tentarLoginLoja() {
-    const { data } = await api.post('/empresa/login', { email, senha });
-    saveAuth({ access_token: data.access_token, empresa: data.empresa });
-    navigate('/loja');
-  }
-
-  async function tentarLoginAdmin() {
-    const { data } = await api.post('/admin/login', { email, senha });
-    saveAuth({ access_token: data.access_token, administrador: data.administrador });
-    navigate('/admin');
-  }
-
-  async function handleLogin(e) {
-    e.preventDefault();
+  async function handleLogin(event) {
+    event.preventDefault();
     setErro('');
     setLoading(true);
+
+    const config = LOGIN_CONFIG[loginType];
+
     try {
-      await tentarLoginUsuario();
-      return;
-    } catch (errorUsuario) {
-      try {
-        await tentarLoginLoja();
-        return;
-      } catch (errorLoja) {
-        try {
-          await tentarLoginAdmin();
-          return;
-        } catch (errorAdmin) {
-          console.error('Erro no login de usuário:', errorUsuario);
-          console.error('Erro no login de loja:', errorLoja);
-          console.error('Erro no login de admin:', errorAdmin);
-          setErro(errorAdmin?.response?.data?.detail || 'Email ou senha incorretos.');
-        }
-      }
+      const { data } = await api.post(config.endpoint, { email, senha });
+      saveAuth(config.buildAuth(data));
+      navigate(config.navigateTo);
+    } catch (error) {
+      console.error(`Erro no login ${loginType}:`, error);
+      setErro(error?.response?.data?.detail || config.fallbackMessage);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-theme flex flex-col items-center justify-center px-4">
+    <div className="theme-page flex min-h-screen flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm theme-card rounded-2xl p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center"><span className="material-icons text-theme-primary">login</span></div>
-          <div><h1 className="text-xl font-bold text-slate-50">Entrar</h1><p className="text-xs text-theme-muted">Acesse sua conta, sua loja ou o painel admin</p></div>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="theme-glass flex h-10 w-10 items-center justify-center rounded-xl">
+            <span className="material-icons text-theme-primary">login</span>
+          </div>
+          <div>
+            <h1 className="theme-title text-xl font-bold">Entrar</h1>
+            <p className="text-xs text-theme-muted">Sua sessao fica salva neste navegador ate voce clicar em sair.</p>
+          </div>
         </div>
+
+        <div className="mb-5 grid grid-cols-3 gap-2">
+          {LOGIN_OPTIONS.map((option) => (
+            <LoginOptionButton
+              key={option.key}
+              active={loginType === option.key}
+              label={option.label}
+              subtitle={option.subtitle}
+              onClick={() => setLoginType(option.key)}
+            />
+          ))}
+        </div>
+
         <form onSubmit={handleLogin} className="space-y-4">
-          <div><label className="text-xs font-semibold text-theme-muted uppercase tracking-wide">Email</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full theme-input rounded-xl px-3 py-3 mt-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/20" placeholder="seu@email.com" /></div>
-          <div><label className="text-xs font-semibold text-theme-muted uppercase tracking-wide">Senha</label><input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required className="w-full theme-input rounded-xl px-3 py-3 mt-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/20" placeholder="••••••••" /></div>
-          {erro && <p className="text-sm text-rose-400">{erro}</p>}
-          <button type="submit" disabled={loading} className="w-full theme-button-primary py-4 rounded-2xl font-bold text-base active:scale-95 transition-transform disabled:opacity-60">{loading ? 'Entrando...' : 'Entrar'}</button>
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-theme-muted">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              className="mt-1.5 w-full rounded-xl px-3 py-3 text-sm theme-input focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+              placeholder="seu@email.com"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-theme-muted">Senha</label>
+            <input
+              type="password"
+              value={senha}
+              onChange={(event) => setSenha(event.target.value)}
+              required
+              className="mt-1.5 w-full rounded-xl px-3 py-3 text-sm theme-input focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+              placeholder="Digite sua senha"
+            />
+          </div>
+
+          {erro ? <p className="text-sm text-rose-400">{erro}</p> : null}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-2xl py-4 text-base font-bold theme-button-primary transition-transform active:scale-95 disabled:opacity-60"
+          >
+            {loading ? 'Entrando...' : `Entrar como ${LOGIN_CONFIG[loginType].navigateTo === '/admin' ? 'admin' : LOGIN_OPTIONS.find((option) => option.key === loginType)?.label.toLowerCase()}`}
+          </button>
         </form>
-        <p className="text-sm text-center text-theme-muted mt-5">Não tem conta? <Link to="/cadastro" className="text-theme-primary font-semibold">Cadastre-se</Link></p>
+
+        <p className="mt-5 text-center text-sm text-theme-muted">
+          Nao tem conta?{' '}
+          <Link to="/cadastro" className="font-semibold text-theme-primary">
+            Cadastre-se
+          </Link>
+        </p>
       </div>
     </div>
   );

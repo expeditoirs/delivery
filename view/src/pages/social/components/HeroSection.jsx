@@ -1,4 +1,11 @@
-export default function HeroSection({ onSearch }) {
+export default function HeroSection({ onSearch, onCategorySelect }) {
+  const categoryItems = [
+    { key: 'pizza', label: 'Pizza' },
+    { key: 'acai', label: 'Acai' },
+    { key: 'burger', label: 'Hamburguer' },
+    { key: 'bebidas', label: 'Bebidas' },
+  ];
+
   return (
     <section className="px-4 pt-4">
       <div className="theme-card rounded-[28px] p-4 relative overflow-hidden">
@@ -7,7 +14,7 @@ export default function HeroSection({ onSearch }) {
 
         <div className="relative z-10">
           <h1 className="text-xl font-semibold leading-tight text-slate-50">
-            O que você vai pedir hoje?
+            O que voce vai pedir hoje?
           </h1>
 
           <button
@@ -22,16 +29,17 @@ export default function HeroSection({ onSearch }) {
           </button>
 
           <div className="flex gap-2 mt-4 overflow-x-auto no-scrollbar">
-            {["Pizza", "Açaí", "Hambúrguer", "Bebidas"].map((item) => (
+            {categoryItems.map((item) => (
               <button
-                key={item}
-                className="px-3 py-1.5 theme-button-secondary rounded-full text-xs whitespace-nowrap active:scale-95"
+                key={item.key}
+                type="button"
+                onClick={() => onCategorySelect?.(item.key)}
+                className="px-3 py-1.5 theme-button-secondary rounded-full text-xs whitespace-nowrap active:scale-95 transition"
               >
-                {item}
+                {item.label}
               </button>
             ))}
           </div>
-
         </div>
       </div>
     </section>

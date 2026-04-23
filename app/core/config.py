@@ -1,5 +1,9 @@
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def _split_csv(value: str | None, default: list[str]) -> list[str]:
     if not value:

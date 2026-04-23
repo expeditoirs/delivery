@@ -90,7 +90,7 @@ export default function Carrinho() {
       </p>
       <button
         onClick={() => navigate("/")}
-        className="bg-theme-primary text-white px-6 py-3 rounded-2xl font-semibold hover:bg-theme-accent transition-colors"
+        className="bg-theme-primary text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-150 hover:bg-theme-accent hover:scale-[1.03] hover:-translate-y-0.5 active:scale-[0.97]"
       >
         Ver restaurantes
       </button>
@@ -161,7 +161,7 @@ return (
 
             <button
               onClick={() => remover(item.linhaKey)}
-              className="text-theme-muted hover:text-theme-accent ml-3 flex-shrink-0 transition-colors"
+              className="text-theme-muted hover:text-theme-accent ml-3 flex-shrink-0 transition-all duration-150 hover:scale-110"
             >
               <span className="material-icons text-xl">delete_outline</span>
             </button>
@@ -171,7 +171,7 @@ return (
             <div className="flex items-center gap-2 bg-theme-hover rounded-xl p-1 border border-theme-border">
               <button
                 onClick={() => diminuir(item.linhaKey)}
-                className="w-8 h-8 bg-theme-surface rounded-lg border border-theme-border flex items-center justify-center font-bold text-theme-text"
+                className="w-8 h-8 bg-theme-surface rounded-lg border border-theme-border flex items-center justify-center font-bold text-theme-text transition-all duration-150 hover:scale-110 active:scale-95"
               >
                 −
               </button>
@@ -182,7 +182,7 @@ return (
 
               <button
                 onClick={() => aumentar(item.linhaKey)}
-                className="w-8 h-8 bg-theme-primary rounded-lg text-white flex items-center justify-center font-bold hover:bg-theme-accent transition-colors"
+                className="w-8 h-8 bg-theme-primary rounded-lg text-white flex items-center justify-center font-bold transition-all duration-150 hover:bg-theme-accent hover:scale-110 active:scale-95"
               >
                 +
               </button>
@@ -199,7 +199,7 @@ return (
     <div className="flex-shrink-0 bg-theme-surface border-t border-theme-border p-4 space-y-3">
       <button
         onClick={() => navigate("/endereco")}
-        className="w-full flex items-center gap-3 bg-theme-hover p-3 rounded-xl border border-theme-border text-left"
+        className="w-full flex items-center gap-3 bg-theme-hover p-3 rounded-xl border border-theme-border text-left transition-all duration-150 hover:bg-white/5 hover:border-blue-400/20 hover:-translate-y-0.5"
       >
         <span className="material-icons text-theme-primary flex-shrink-0">
           location_on
@@ -221,14 +221,14 @@ return (
       </div>
 
       <button
-        className="w-full bg-theme-primary text-white py-4 rounded-2xl font-bold text-base hover:bg-theme-accent transition-colors"
+        className="w-full bg-theme-primary text-white py-4 rounded-2xl font-bold text-base transition-all duration-150 hover:bg-theme-accent hover:scale-[1.015] hover:-translate-y-0.5 active:scale-[0.98]"
         onClick={finalizarPedido}
       >
         Finalizar pedido
       </button>
 
       <button
-        className="w-full text-theme-muted text-sm py-1 hover:text-theme-text transition-colors"
+        className="w-full text-theme-muted text-sm py-1 transition-all duration-150 hover:text-theme-text hover:scale-[1.02]"
         onClick={limpar}
       >
         Limpar carrinho

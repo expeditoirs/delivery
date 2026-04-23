@@ -30,11 +30,11 @@ export default function BottomNav() {
           key={to}
           to={to}
           end={end}
-          className={({ isActive }) => `flex h-full flex-1 flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? 'text-theme-primary' : 'text-slate-400'}`}
+          className={({ isActive }) => `flex h-full flex-1 flex-col items-center justify-center gap-0.5 transition-all duration-150 ${isActive ? 'text-theme-primary' : 'text-slate-400 hover:text-slate-200'}`}
         >
           {({ isActive }) => (
             <>
-              <span className="material-icons text-[22px]">{icon}</span>
+              <span className={`material-icons text-[22px] transition-transform duration-150 ${isActive ? '' : 'hover:scale-110'}`}>{icon}</span>
               <span className="text-[10px] font-medium">{label}</span>
               {isActive ? <span className="mt-0.5 h-1 w-1 rounded-full bg-cyan-400" /> : null}
             </>

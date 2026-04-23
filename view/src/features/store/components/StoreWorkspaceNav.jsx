@@ -17,10 +17,10 @@ export default function StoreWorkspaceNav({ section, setSection, pedidos = [], i
               key={item.key}
               type="button"
               onClick={() => setSection(item.key)}
-              className={`min-w-[150px] rounded-2xl border px-4 py-3 text-left transition md:min-w-0 ${
+              className={`min-w-[150px] rounded-2xl border px-4 py-3 text-left transition-all duration-150 md:min-w-0 ${
                 active
-                  ? 'border-orange-500 bg-[linear-gradient(135deg,#f97316,#ef4444)] text-white shadow-[0_18px_36px_rgba(249,115,22,0.28)]'
-                  : 'border-slate-200 bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50/60'
+                  ? 'border-orange-500 bg-[linear-gradient(135deg,#f97316,#ef4444)] text-white shadow-[0_18px_36px_rgba(249,115,22,0.28)] scale-[1.02]'
+                  : 'border-slate-200 bg-white text-slate-700 hover:border-orange-200 hover:bg-orange-50/60 hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-md'
               }`}
             >
               <div className="flex items-center gap-3">

@@ -76,7 +76,7 @@ export default function PostActions({
         <button
           type="button"
           onClick={onToggleLike}
-          className={`flex items-center gap-1 transition-colors ${
+          className={`flex items-center gap-1 transition-all duration-150 hover:scale-105 ${
             liked ? "text-theme-accent" : "text-theme-muted hover:text-theme-text"
           }`}
         >
@@ -89,7 +89,7 @@ export default function PostActions({
         <button
           type="button"
           onClick={onOpenComments}
-          className="flex items-center gap-1 text-theme-muted hover:text-theme-text transition-colors"
+          className="flex items-center gap-1 text-theme-muted hover:text-theme-text transition-all duration-150 hover:scale-105"
         >
           <span className="material-icons">chat_bubble_outline</span>
           <span className="text-xs font-medium">Comentar</span>
@@ -98,7 +98,7 @@ export default function PostActions({
         <button
           type="button"
           onClick={handleShare}
-          className="flex items-center gap-1 text-theme-muted hover:text-theme-text transition-colors"
+          className="flex items-center gap-1 text-theme-muted hover:text-theme-text transition-all duration-150 hover:scale-105"
         >
           <span className="material-icons">send</span>
           <span className="text-xs font-medium">Enviar</span>

@@ -47,10 +47,10 @@ function LoginOptionButton({ active, label, subtitle, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-2xl border px-3 py-3 text-left transition-colors ${
+      className={`rounded-2xl border px-3 py-3 text-left transition-all duration-150 ${
         active
-          ? 'border-theme bg-white/10 theme-title'
-          : 'border-theme theme-glass text-theme-muted hover:bg-white/10'
+          ? 'border-blue-400/40 bg-white/10 theme-title scale-[1.03] shadow-[0_0_14px_rgba(59,130,246,0.18)]'
+          : 'border-theme theme-glass text-theme-muted hover:bg-white/10 hover:scale-[1.03] hover:border-blue-400/25 hover:text-theme-title'
       }`}
     >
       <p className="text-sm font-semibold">{label}</p>
@@ -155,7 +155,7 @@ export default function Login() {
 
         <p className="mt-5 text-center text-sm text-theme-muted">
           Nao tem conta?{' '}
-          <Link to="/cadastro" className="font-semibold text-theme-primary">
+          <Link to="/cadastro" className="font-semibold text-theme-primary transition-all duration-150 hover:brightness-125 hover:underline">
             Cadastre-se
           </Link>
         </p>

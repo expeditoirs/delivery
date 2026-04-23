@@ -53,6 +53,24 @@ button, input, textarea, select {
   font: inherit;
 }
 
+button {
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: scale(1.04);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 .theme-surface {
   background: var(--color-surface-soft);
   backdrop-filter: blur(18px);
@@ -89,12 +107,38 @@ button, input, textarea, select {
 .theme-button-primary {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: white;
+  cursor: pointer;
+  transition: filter 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+}
+
+.theme-button-primary:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: 0 6px 22px rgba(59, 130, 246, 0.32);
+}
+
+.theme-button-primary:active:not(:disabled) {
+  transform: scale(0.97);
+  filter: brightness(1.0);
+  box-shadow: none;
 }
 
 .theme-button-secondary {
   background: var(--color-button-secondary-bg);
   border: 1px solid var(--color-border);
   color: var(--color-text);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+}
+
+.theme-button-secondary:hover:not(:disabled) {
+  background: var(--color-elevated-hover);
+  border-color: rgba(59, 130, 246, 0.28);
+  transform: translateY(-1px);
+}
+
+.theme-button-secondary:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .theme-input {

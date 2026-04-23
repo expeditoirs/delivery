@@ -11,10 +11,10 @@ function MenuItem({ icon, title, subtitle, onClick, danger = false }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between rounded-3xl border px-4 py-4 transition ${
+      className={`group w-full flex items-center justify-between rounded-3xl border px-4 py-4 transition-all duration-150 hover:-translate-y-0.5 ${
         danger
-          ? "border-red-500/20 bg-red-500/10 hover:bg-red-500/15"
-          : "border-theme bg-white/5 hover:bg-white/10"
+          ? "border-red-500/20 bg-red-500/10 hover:bg-red-500/15 hover:shadow-[0_4px_16px_rgba(239,68,68,0.12)]"
+          : "border-theme bg-white/5 hover:bg-white/10 hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
       }`}
     >
       <div className="flex items-center gap-4 text-left">
@@ -38,7 +38,7 @@ function MenuItem({ icon, title, subtitle, onClick, danger = false }) {
         </div>
       </div>
 
-      <span className={`material-icons ${danger ? "text-red-300" : "theme-muted"}`}>
+      <span className={`material-icons transition-transform duration-150 group-hover:translate-x-0.5 ${danger ? "text-red-300" : "theme-muted"}`}>
         chevron_right
       </span>
     </button>

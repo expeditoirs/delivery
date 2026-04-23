@@ -9,5 +9,4 @@ class BairroCreate(BairroBase):
 class BairroRead(BairroBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}

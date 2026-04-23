@@ -27,7 +27,7 @@ export default function SidebarLayout({
       {hasSession ? (
         <button
           onClick={sair}
-          className="mb-2 flex items-center gap-3 rounded-xl px-3 py-3 text-sm theme-title hover:bg-white/10"
+          className="mb-2 flex items-center gap-3 rounded-xl px-3 py-3 text-sm theme-title transition-all duration-150 hover:bg-white/10 hover:translate-x-1"
         >
           <span className="material-icons text-xl">logout</span>
           Sair
@@ -37,10 +37,10 @@ export default function SidebarLayout({
           <NavLink
             to="/login"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${
+              `flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-all duration-150 ${
                 isActive
                   ? 'bg-blue-500/15 text-theme-primary font-semibold'
-                  : 'theme-title hover:bg-white/10'
+                  : 'theme-title hover:bg-white/10 hover:translate-x-1'
               }`
             }
           >
@@ -51,10 +51,10 @@ export default function SidebarLayout({
           <NavLink
             to="/cadastro"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors ${
+              `flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-all duration-150 ${
                 isActive
                   ? 'bg-blue-500/15 text-theme-primary font-semibold'
-                  : 'theme-title hover:bg-white/10'
+                  : 'theme-title hover:bg-white/10 hover:translate-x-1'
               }`
             }
           >
@@ -73,10 +73,10 @@ export default function SidebarLayout({
             to={to}
             end={end}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-3 rounded-xl transition-colors text-sm ${
+              `flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-150 text-sm ${
                 isActive
                   ? 'bg-blue-500/15 text-theme-primary font-semibold'
-                  : 'theme-title hover:bg-white/10'
+                  : 'theme-title hover:bg-white/10 hover:translate-x-1'
               }`
             }
           >

@@ -10,21 +10,6 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.core.config import settings
 from app.core.database import Base, SessionLocal, engine
-from app.models import (
-    administrador,
-    bairro,
-    categoria,
-    cidade,
-    comentario_empresa,
-    empresa,
-    empresa_bairro,
-    item,
-    pedido,
-    pedido_item,
-    publicacao_cliente,
-    story_empresa,
-    usuario,
-)  # noqa: F401
 from app.api.v1.endpoints import (
     bairro,
     categoria,
@@ -118,22 +103,32 @@ def _ensure_database_compatibility():
     else:
         return
 
+    _IGNORABLE = ('duplicate column', 'already exists', 'index already exists')
+
     with engine.begin() as conn:
         for stmt in statements:
             try:
                 conn.execute(text(stmt))
             except Exception as e:
-                print(f'Erro ao executar ajuste de banco: {e}')
+                msg = str(e).lower()
+                if not any(hint in msg for hint in _IGNORABLE):
+                    print(f'Erro ao executar ajuste de banco: {e}')
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    _ensure_database_compatibility()
+    try:
+        Base.metadata.create_all(bind=engine)
+        _ensure_database_compatibility()
+    except Exception as e:
+        print(f'Erro ao inicializar banco: {e}')
 
     db = SessionLocal()
     try:
         seed_demo_data(db)
+    except Exception as e:
+        print(f'Erro no seed (ignorado): {e}')
+        db.rollback()
     finally:
         db.close()
 

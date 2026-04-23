@@ -50,8 +50,8 @@ export default function Register() {
         </div>
 
         <div className="theme-glass mb-5 grid grid-cols-2 rounded-2xl border border-theme p-1">
-          <button type="button" onClick={() => setTipo("usuario")} className={`py-2 rounded-xl text-sm font-semibold ${tipo === "usuario" ? "bg-blue-500/15 text-theme-primary" : "text-theme-muted"}`}>Usuário</button>
-          <button type="button" onClick={() => setTipo("loja")} className={`py-2 rounded-xl text-sm font-semibold ${tipo === "loja" ? "bg-blue-500/15 text-theme-primary" : "text-theme-muted"}`}>Loja</button>
+          <button type="button" onClick={() => setTipo("usuario")} className={`py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${tipo === "usuario" ? "bg-blue-500/15 text-theme-primary scale-[1.04] shadow-[0_0_10px_rgba(59,130,246,0.15)]" : "text-theme-muted hover:bg-white/5 hover:text-theme-title hover:scale-[1.04]"}`}>Usuário</button>
+          <button type="button" onClick={() => setTipo("loja")} className={`py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${tipo === "loja" ? "bg-blue-500/15 text-theme-primary scale-[1.04] shadow-[0_0_10px_rgba(59,130,246,0.15)]" : "text-theme-muted hover:bg-white/5 hover:text-theme-title hover:scale-[1.04]"}`}>Loja</button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,7 +94,7 @@ export default function Register() {
           <button type="submit" disabled={loading} className="w-full theme-button-primary py-3.5 rounded-2xl font-bold text-sm disabled:opacity-60">{loading ? "Cadastrando..." : "Criar conta"}</button>
         </form>
 
-        <div className="mt-5 text-sm text-center text-theme-muted">Já tem conta? <Link to="/login" className="text-theme-primary font-semibold">Entrar</Link></div>
+        <div className="mt-5 text-sm text-center text-theme-muted">Já tem conta? <Link to="/login" className="text-theme-primary font-semibold transition-all duration-150 hover:brightness-125 hover:underline">Entrar</Link></div>
       </div>
     </div>
   );

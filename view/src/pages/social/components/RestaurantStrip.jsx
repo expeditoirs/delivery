@@ -25,7 +25,7 @@ export default function RestaurantStrip({ empresas, loading, onOpen }) {
             type="button"
             key={empresa.id}
             onClick={() => onOpen(empresa)}
-            className="min-w-[190px] theme-card rounded-3xl p-4 text-left active:scale-[0.98] transition-transform"
+            className="min-w-[190px] theme-card rounded-3xl p-4 text-left transition-all duration-150 hover:scale-[1.03] hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
           >
             <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-theme-primary mb-3">
               <span className="material-icons">storefront</span>

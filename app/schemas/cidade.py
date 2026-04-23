@@ -10,6 +10,5 @@ class CidadeCreate(CidadeBase):
 class CidadeRead(CidadeBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
     

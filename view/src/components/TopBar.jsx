@@ -45,7 +45,7 @@ export default function TopBar({ endereco }) {
     <div className="flex h-16 items-center border-b border-theme px-4 theme-surface">
       <div className="flex w-full items-center justify-between gap-3">
         {role === 'user' ? (
-          <button onClick={() => navigate('/endereco')} className="flex max-w-[58%] items-center gap-1.5 overflow-hidden">
+          <button onClick={() => navigate('/endereco')} className="flex max-w-[58%] items-center gap-1.5 overflow-hidden rounded-xl px-1 py-1 transition-all duration-150 hover:bg-white/5 hover:scale-[1.02]">
             <span className="material-icons text-xl text-theme-primary">location_on</span>
             <div className="overflow-hidden text-left">
               <p className="text-xs leading-tight text-theme-muted">Entregar em</p>
@@ -85,14 +85,14 @@ export default function TopBar({ endereco }) {
               }
               navigate('/login');
             }}
-            className="p-2 theme-muted"
+            className="rounded-xl p-2 theme-muted transition-all duration-150 hover:bg-white/5 hover:scale-110"
             title={profileLabel ? 'Sair' : 'Entrar'}
           >
             <span className="material-icons text-[22px]">{profileLabel ? 'logout' : 'login'}</span>
           </button>
 
           {role === 'user' ? (
-            <button onClick={() => navigate('/carrinho')} className="relative p-2">
+            <button onClick={() => navigate('/carrinho')} className="relative rounded-xl p-2 transition-all duration-150 hover:bg-white/5 hover:scale-110">
               {totalItens > 0 ? (
                 <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-cyan-500 text-xs font-bold leading-none text-white">
                   {totalItens}
